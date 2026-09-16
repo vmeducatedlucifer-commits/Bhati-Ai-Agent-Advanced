@@ -756,6 +756,13 @@ export const useStore = create<State>((set, get) => ({
               openFile: { path: display.path as string, content: display.content as string, dirty: false },
               computerTab: "editor",
             });
+          } else if (display.kind === "agent_spawn" || display.kind === "agent_kill" || display.kind === "agent_kill_all") {
+            void get().refreshSubAgents();
+            set({ computerTab: "agents" });
+          } else if (display.kind === "swarm_deploy" || display.kind === "swarm_kill") {
+            void get().refreshSwarms();
+            void get().refreshSubAgents();
+            set({ computerTab: "agents" });
           }
         }
         break;
