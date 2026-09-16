@@ -11,7 +11,7 @@ import {
   Crosshair,
   ChevronLeft,
   ListChecks,
-  Bot,
+  Cpu,
 } from "lucide-react";
 import { useEffect } from "react";
 import { ActivityFeed } from "@/components/computer/ActivityFeed";
