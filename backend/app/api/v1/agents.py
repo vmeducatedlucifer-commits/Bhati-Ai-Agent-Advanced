@@ -32,6 +32,27 @@ class SwarmDeployRequest(BaseModel):
     max_steps: int = 25
 
 
+# ── Agent types info (MUST be before /{thread_id} to avoid route conflict) ──────
+
+@router.get("/types/info", summary="List available agent types")
+async def list_agent_types():
+    from app.agent.subagent_manager import AGENT_TYPES, PRIORITY_LEVELS
+    return {
+        "agent_types": {
+            k: {
+                "system_prompt": v["system_prompt"][:200],
+                "priority_default": v["priority_default"],
+                "max_steps_default": v["max_steps_default"],
+                "icon": v["icon"],
+                "color": v["color"],
+            }
+            for k, v in AGENT_TYPES.items()
+        },
+        "priority_levels": PRIORITY_LEVELS,
+        "strategies": ["parallel", "sequential", "map_reduce", "hierarchical"],
+    }
+
+
 # ── SubAgent endpoints ──────────────────────────────────────────────────────
 
 @router.get("/{thread_id}", summary="List subagents for a thread")
