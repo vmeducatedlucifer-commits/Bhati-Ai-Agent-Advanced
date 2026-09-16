@@ -32,7 +32,7 @@ import { cn } from "@/lib/utils";
 const TABS: { value: ComputerTab; label: string; icon: typeof Activity }[] = [
   { value: "activity", label: "Activity", icon: Activity },
   { value: "plan", label: "Plan", icon: ListChecks },
-  { value: "agents", label: "Agents", icon: Bot },
+  { value: "agents", label: "Agents", icon: Cpu },
   { value: "terminal", label: "Terminal", icon: TerminalIcon },
   { value: "editor", label: "Editor", icon: Code2 },
   { value: "browser", label: "Browser", icon: Globe },
