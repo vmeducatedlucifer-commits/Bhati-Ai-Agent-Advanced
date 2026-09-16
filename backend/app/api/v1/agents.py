@@ -145,24 +145,3 @@ async def kill_swarm(thread_id: str, swarm_id: str):
     from app.agent.swarm_manager import kill_swarm as _kill
     count = await _kill(swarm_id)
     return {"status": "killed", "swarm_id": swarm_id, "killed_count": count}
-
-
-# ── Agent types info ─────────────────────────────────────────────────────────
-
-@router.get("/types/info", summary="List available agent types")
-async def list_agent_types():
-    from app.agent.subagent_manager import AGENT_TYPES, PRIORITY_LEVELS
-    return {
-        "agent_types": {
-            k: {
-                "system_prompt": v["system_prompt"][:200],
-                "priority_default": v["priority_default"],
-                "max_steps_default": v["max_steps_default"],
-                "icon": v["icon"],
-                "color": v["color"],
-            }
-            for k, v in AGENT_TYPES.items()
-        },
-        "priority_levels": PRIORITY_LEVELS,
-        "strategies": ["parallel", "sequential", "map_reduce", "hierarchical"],
-    }
