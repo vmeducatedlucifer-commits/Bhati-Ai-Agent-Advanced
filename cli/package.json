@@ -1,0 +1,15 @@
+{
+  "name": "rawal",
+  "version": "1.0.0",
+  "description": "Install and deploy the Rawal AI autonomous workspace",
+  "type": "module",
+  "bin": {
+    "rawal": "index.js"
+  },
+  "files": ["index.js", "README.md"],
+  "engines": {
+    "node": ">=18"
+  },
+  "keywords": ["rawal", "ai-agent", "autonomous-agent", "self-hosted"],
+  "license": "MIT"
+}

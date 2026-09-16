@@ -1,0 +1,35 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: rawal-ai:latest
+    ports:
+      - "8000:8000"
+    environment:
+      ENV: prod
+      SECRET_KEY: ${SECRET_KEY:-change-me-please-use-a-64-character-random-string}
+      JWT_SECRET: ${JWT_SECRET:-change-me-too-use-a-64-character-random-string}
+      AUTH_PASSWORD: ${AUTH_PASSWORD:-}
+      DEFAULT_LLM_BASE_URL: ${DEFAULT_LLM_BASE_URL:-https://api.openai.com/v1}
+      DEFAULT_LLM_API_KEY: ${DEFAULT_LLM_API_KEY:-}
+      DEFAULT_LLM_MODEL: ${DEFAULT_LLM_MODEL:-gpt-4o-mini}
+      # Sibling containers: the backend talks to the host daemon over this socket.
+      SANDBOX_BACKEND: docker
+      SANDBOX_IMAGE: rawal-ai-sandbox:latest
+      DOCKER_HOST: unix:///var/run/docker.sock
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      # Workspaces are bind-mounted into sandbox containers by the host daemon, so
+      # this path must be identical inside and outside this container.
+      - ${PWD}/data:/data
+    restart: unless-stopped
+
+  sandbox-image:
+    # One-shot build so `docker compose up` has the sandbox image ready.
+    build:
+      context: ./sandbox
+      dockerfile: Dockerfile
+    image: rawal-ai-sandbox:latest
+    command: ["true"]
+    restart: "no"

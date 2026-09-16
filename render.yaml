@@ -1,0 +1,74 @@
+services:
+  - type: web
+    name: rawal-ai
+    runtime: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    healthCheckPath: /api/v1/health
+    autoDeploy: true
+    envVars:
+      - key: ENV
+        value: prod
+      - key: SECRET_KEY
+        generateValue: true
+      - key: JWT_SECRET
+        generateValue: true
+      # Agent-only key for the embedded model gateway (loopback, never public).
+      # NOTE: generateValue fills only brand-new services; on this existing
+      # service it stays empty and start.sh generates an ephemeral secret per
+      # boot instead. To pin a stable value, set it manually in Dashboard.
+      - key: GATEWAY_SHARED_SECRET
+        generateValue: true
+      - key: GATEWAY_URL
+        value: http://127.0.0.1:8081/v1
+      # Set a password here to require sign-in. Leave empty for an open instance.
+      - key: AUTH_PASSWORD
+        sync: false
+      - key: ALLOW_ANONYMOUS
+        value: "true"
+      - key: DEFAULT_LLM_BASE_URL
+        value: https://api.openai.com/v1
+      - key: DEFAULT_LLM_API_KEY
+        sync: false
+      - key: DEFAULT_LLM_MODEL
+        value: gpt-4o-mini
+      # Enable robust persistence to MongoDB. Render Free tier spins down, so this prevents data loss!
+      - key: MONGO_URI
+        sync: false
+      - key: DATABASE_NAME
+        value: rawal_ai
+      # Enable Google Drive storage persistence for all workspace code and files (optional)
+      - key: GDRIVE_CREDENTIALS_JSON
+        sync: false
+      - key: GDRIVE_FOLDER_ID
+        sync: false
+      # Enable Telegram Bot Interface (optional)
+      - key: TELEGRAM_BOT_TOKEN
+        sync: false
+      - key: TELEGRAM_ALLOWED_USER_IDS
+        sync: false
+      # Render does not expose a Docker daemon, so sandboxes run in-process.
+      - key: SANDBOX_BACKEND
+        value: local
+      # Recommended for Render Free: remote Chromium over CDP keeps browser RAM
+      # outside the 512 MB API container. Set this in the Render dashboard.
+      - key: BROWSER_CDP_URL
+        sync: false
+      - key: BROWSER_MAX_SESSIONS
+        value: "1"
+      - key: BROWSER_IDLE_TIMEOUT_S
+        value: "900"
+      # Superserve cloud sandboxes (optional — or set in Settings → Sandbox).
+      - key: SUPERSERVE_API_KEY
+        sync: false
+      - key: SUPERSERVE_TEMPLATE
+        value: superserve/base
+      - key: SUPERSERVE_POOL_SIZE
+        value: 5
+      - key: DATA_DIR
+        value: /data
+      - key: WORKSPACE_ROOT
+        value: /data/workspaces
+      - key: CORS_ORIGINS
+        value: "*"

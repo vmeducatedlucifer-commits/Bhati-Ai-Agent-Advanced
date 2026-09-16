@@ -1,0 +1,521 @@
+@import "@xterm/xterm/css/xterm.css";
+@import "highlight.js/styles/github-dark.css";
+
+/* Self-hosted fonts (no third-party requests, no visitor-IP leak to Google).
+   Variable files cover all used weights; font-display: swap avoids invisible text. */
+@font-face {
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url("./assets/fonts/inter-latin.woff2") format("woff2");
+}
+@font-face {
+  font-family: "JetBrains Mono";
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url("./assets/fonts/jetbrains-mono-latin.woff2") format("woff2");
+}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Apple-like clean white light theme */
+    --background: 0 0% 98%;
+    --surface: 0 0% 100%;
+    --elevated: 0 0% 100%;
+    --foreground: 240 7% 11%;
+    --muted: 240 5% 94.5%;
+    --muted-foreground: 240 4% 44%;
+    --border: 240 6% 90%;
+    --input: 240 6% 90%;
+    --ring: 14 63% 59%;
+    --primary: 14 63% 59%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 240 5% 94%;
+    --secondary-foreground: 240 7% 14%;
+    --accent: 240 5% 93%;
+    --accent-foreground: 240 7% 12%;
+    --danger: 0 68% 50%;
+    --danger-foreground: 0 0% 100%;
+    --success: 152 55% 35%;
+    --warning: 35 90% 44%;
+  }
+
+  .dark {
+    --background: 232 35% 7%;
+    --surface: 232 30% 10%;
+    --elevated: 232 26% 14%;
+    --foreground: 220 30% 96%;
+    --muted: 232 22% 16%;
+    --muted-foreground: 220 14% 64%;
+    --border: 225 23% 22%;
+    --input: 225 23% 22%;
+    --ring: 187 92% 58%;
+    --primary: 187 92% 58%;
+    --primary-foreground: 232 35% 7%;
+    --secondary: 232 22% 17%;
+    --secondary-foreground: 220 30% 96%;
+    --accent: 232 24% 20%;
+    --accent-foreground: 220 30% 96%;
+    --danger: 0 72% 62%;
+    --danger-foreground: 0 0% 100%;
+    --success: 158 70% 52%;
+    --warning: 40 92% 62%;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    overscroll-behavior: none;
+  }
+
+  ::selection {
+    @apply bg-primary/25;
+  }
+}
+
+@layer components {
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--border)) transparent;
+  }
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 9px;
+    height: 9px;
+  }
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    @apply rounded-full bg-border;
+    border: 2px solid transparent;
+    background-clip: content-box;
+  }
+  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    @apply bg-muted-foreground/50;
+    background-clip: content-box;
+  }
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .prose-chat {
+    @apply text-[15px] leading-[1.7] break-words overflow-hidden;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+  .prose-chat > * + * {
+    @apply mt-4;
+  }
+  .prose-chat h1 {
+    @apply mt-6 text-xl font-semibold tracking-tight;
+  }
+  .prose-chat h2 {
+    @apply mt-6 text-lg font-semibold tracking-tight;
+  }
+  .prose-chat h3 {
+    @apply mt-5 text-base font-semibold;
+  }
+  .prose-chat p {
+    @apply whitespace-pre-wrap;
+  }
+  .prose-chat ul {
+    @apply list-disc space-y-1.5 pl-5;
+  }
+  .prose-chat ol {
+    @apply list-decimal space-y-1.5 pl-5;
+  }
+  .prose-chat li > p {
+    @apply my-0;
+  }
+  .prose-chat a {
+    @apply text-primary underline underline-offset-2 hover:opacity-80;
+  }
+  .prose-chat blockquote {
+    @apply border-l-2 border-primary/40 pl-4 italic text-muted-foreground;
+  }
+  .prose-chat table {
+    @apply w-full border-collapse overflow-hidden rounded-lg text-sm;
+  }
+  .prose-chat th {
+    @apply border border-border bg-muted/60 px-3 py-2 text-left font-medium;
+  }
+  .prose-chat td {
+    @apply border border-border px-3 py-2 align-top;
+  }
+  .prose-chat code:not(pre code) {
+    @apply rounded bg-muted px-1.5 py-0.5 font-mono text-[0.85em] text-foreground;
+  }
+  .prose-chat hr {
+    @apply my-6 border-border;
+  }
+
+  .diff-line-add {
+    @apply bg-emerald-500/10 text-emerald-600 dark:text-emerald-400;
+  }
+  .diff-line-del {
+    @apply bg-rose-500/10 text-rose-600 dark:text-rose-400;
+  }
+  .diff-line-hunk {
+    @apply bg-sky-500/10 text-sky-600 dark:text-sky-400;
+  }
+
+  /* ---- advanced visual system ---- */
+
+  /* Animated gradient headline text */
+  .text-gradient {
+    @apply bg-clip-text text-transparent;
+    background-image: linear-gradient(100deg, #67e8f9 5%, #a78bfa 42%, #f0abfc 72%, #67e8f9 100%);
+    background-size: 220% auto;
+    animation: gradient-pan 6s ease infinite;
+  }
+  .dark .text-gradient {
+    background-image: linear-gradient(100deg, #67e8f9 5%, #a78bfa 42%, #f0abfc 72%, #67e8f9 100%);
+    background-size: 220% auto;
+  }
+
+  .workspace-stage {
+    background-image: linear-gradient(hsl(var(--primary) / 0.035) 1px, transparent 1px), linear-gradient(90deg, hsl(var(--primary) / 0.035) 1px, transparent 1px);
+    background-size: 44px 44px;
+    background-position: center;
+  }
+  .workspace-stage::before {
+    content: "";
+    pointer-events: none;
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 28% 12%, hsl(187 92% 58% / 0.13), transparent 28%), radial-gradient(circle at 84% 76%, hsl(265 85% 68% / 0.12), transparent 30%);
+    opacity: 0.9;
+  }
+
+  /* Frosted glass panel */
+  .glass {
+    @apply border border-border/60 bg-surface/70 backdrop-blur-xl;
+  }
+
+  /* Liquid-glass bar (sidebar, topbar, composer dock): translucent, saturated
+     blur with a specular top highlight — Apple-style frosted chrome. */
+  .liquid-bar {
+    background: linear-gradient(180deg, hsl(var(--surface) / 0.8), hsl(var(--surface) / 0.62));
+    -webkit-backdrop-filter: blur(22px) saturate(1.7);
+    backdrop-filter: blur(22px) saturate(1.7);
+    box-shadow:
+      inset 0 1px 0 hsl(0 0% 100% / 0.65),
+      0 10px 28px -18px hsl(240 7% 11% / 0.28);
+  }
+  .dark .liquid-bar {
+    background: linear-gradient(180deg, hsl(var(--surface) / 0.84), hsl(var(--surface) / 0.66));
+    -webkit-backdrop-filter: blur(22px) saturate(1.4);
+    backdrop-filter: blur(22px) saturate(1.4);
+    box-shadow:
+      inset 0 1px 0 hsl(0 0% 100% / 0.07),
+      0 10px 28px -18px hsl(0 0% 0% / 0.65);
+  }
+
+  /* Soft primary glow for focus / active states */
+  .glow-primary {
+    box-shadow: 0 0 0 1px hsl(var(--primary) / 0.35), 0 8px 32px -8px hsl(var(--primary) / 0.45);
+  }
+  .glow-soft {
+    box-shadow: 0 12px 40px -12px hsl(var(--primary) / 0.35);
+  }
+
+  /* Blurred ambient orbs behind heroes */
+  .orb {
+    @apply pointer-events-none absolute rounded-full blur-3xl;
+  }
+
+  /* Staggered entrance delays */
+  .stagger-1 { animation-delay: 60ms; }
+  .stagger-2 { animation-delay: 140ms; }
+  .stagger-3 { animation-delay: 220ms; }
+  .stagger-4 { animation-delay: 300ms; }
+  .stagger-5 { animation-delay: 380ms; }
+  .rise-stagger {
+    opacity: 0;
+    animation: rise-in 480ms cubic-bezier(0.21, 1.02, 0.73, 1) forwards;
+  }
+
+  /* Streaming caret at the end of live text */
+  .streaming-caret::after {
+    content: "";
+    display: inline-block;
+    width: 8px;
+    height: 1.05em;
+    margin-left: 3px;
+    vertical-align: text-bottom;
+    border-radius: 2px;
+    background: hsl(var(--primary));
+    animation: caret-blink 1.05s step-end infinite;
+  }
+
+  /* Skeleton shimmer for loading placeholders */
+  .skeleton {
+    @apply relative overflow-hidden rounded-md bg-muted;
+  }
+  .skeleton::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    transform: translateX(-100%);
+    background: linear-gradient(90deg, transparent, hsl(var(--foreground) / 0.08), transparent);
+    animation: shimmer 1.8s infinite;
+  }
+
+  /* Equalizer bars (voice / activity) */
+  .eq-bar {
+    width: 3px;
+    border-radius: 9999px;
+    background: hsl(var(--primary));
+    transform-origin: center;
+    animation: eq-bounce 1s ease-in-out infinite;
+  }
+
+  /* Gradient border card */
+  .gradient-border {
+    position: relative;
+    background:
+      linear-gradient(hsl(var(--surface)), hsl(var(--surface))) padding-box,
+      linear-gradient(135deg, hsl(var(--primary) / 0.55), transparent 40%, transparent 60%, hsl(var(--primary) / 0.4)) border-box;
+    border: 1px solid transparent;
+  }
+
+  /* Interactive lift on hover */
+  .lift {
+    transition: transform 220ms cubic-bezier(0.21, 1.02, 0.73, 1), box-shadow 220ms ease, border-color 220ms ease;
+  }
+  .lift:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 14px 34px -14px hsl(var(--foreground) / 0.28);
+  }
+
+  /* Chat composer shell: glows when the textarea is focused */
+  .composer-shell {
+    transition: border-color 220ms ease, box-shadow 280ms ease;
+  }
+  .composer-shell:focus-within {
+    border-color: hsl(var(--primary) / 0.55);
+    box-shadow: 0 0 0 1px hsl(var(--primary) / 0.3), 0 10px 36px -12px hsl(var(--primary) / 0.4);
+  }
+
+  /* ---- 120fps message list ---- */
+
+  /* Keeps scroll chained inside the chat pane (no page bounce on mobile). */
+  .msg-scroll {
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Off-screen messages skip layout/paint — long chats stay at 120fps. */
+  .msg-view {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 140px;
+  }
+
+  /* Thread-row (and similar) actions are hover-revealed on desktop, but
+     touch screens have no hover — keep them visible there so chat actions
+     stay reachable on mobile. */
+  @media (hover: none) {
+    .reveal-on-hover {
+      opacity: 1 !important;
+    }
+  }
+
+  /* ---- low-end performance mode (.perf-low on <html>) ---- */
+
+  /* Ambient orbs + float loops are the main GPU cost — drop them entirely. */
+  .perf-low .orb {
+    display: none !important;
+  }
+  .perf-low .animate-float,
+  .perf-low .animate-float-slow,
+  .perf-low .animate-orb-drift,
+  .perf-low .animate-gradient-pan,
+  .perf-low .animate-pulse-ring,
+  .perf-low .animate-glow-pulse,
+  .perf-low .animate-spin-slow,
+  .perf-low .orbit-core,
+  .perf-low .orbit-ring-a,
+  .perf-low .orbit-ring-b,
+  .perf-low .tdot {
+    animation: none !important;
+  }
+  /* Frosted glass is expensive to composite — fall back to solid surface. */
+  .perf-low .glass {
+    backdrop-filter: none !important;
+    background: hsl(var(--surface)) !important;
+  }
+  /* Functional micro-feedback (caret, typing dots, entrances) stays on. */
+
+  /* ---- directional tab motion ---- */
+  /* A parent with data-tab-dir="left|right" makes the newly activated panel
+     slide in from the navigation direction (replays on data-state flip). */
+  [data-tab-dir="right"] .anim-tab-slide[data-state="active"] {
+    animation: slide-from-right 260ms cubic-bezier(0.21, 1.02, 0.73, 1);
+  }
+  [data-tab-dir="left"] .anim-tab-slide[data-state="active"] {
+    animation: slide-from-left 260ms cubic-bezier(0.21, 1.02, 0.73, 1);
+  }
+
+  /* Fade edges on horizontally scrollable tab strips (affordance + polish). */
+  .tabs-fade-x {
+    -webkit-mask-image: linear-gradient(90deg, transparent, black 28px, black calc(100% - 28px), transparent);
+    mask-image: linear-gradient(90deg, transparent, black 28px, black calc(100% - 28px), transparent);
+  }
+
+  /* ---- premium thinking indicator ---- */
+  /* Orbiting conic ring (spun via animate-spin on the element). */
+  .thinking-ring {
+    background: conic-gradient(from 0deg, hsl(var(--primary)), hsl(var(--primary) / 0.15) 70%, transparent);
+  }
+  /* Shimmer sweep bar under the thinking status. */
+  .thinking-shimmer {
+    background: linear-gradient(90deg, hsl(var(--primary) / 0.12), hsl(var(--primary) / 0.55), hsl(var(--primary) / 0.12));
+    background-size: 200% 100%;
+    animation: thinking-sweep 1.6s ease-in-out infinite;
+  }
+  @keyframes thinking-sweep {
+    0% { background-position: 120% 0; }
+    100% { background-position: -120% 0; }
+  }
+
+  /* ---- live orbit indicator (thinking / working) ----
+     Breathing gradient core + two counter-rotating satellite dots.
+     Bigger, calmer and more distinctive than the old single spinner. */
+  .orbit-core {
+    position: absolute;
+    inset: 9px;
+    border-radius: 9999px;
+    background: radial-gradient(circle, hsl(var(--primary)) 0%, hsl(var(--primary) / 0.25) 60%, transparent 72%);
+    animation: orbit-breathe 2.2s ease-in-out infinite;
+  }
+  .orbit-ring {
+    position: absolute;
+    inset: 0;
+    border-radius: 9999px;
+  }
+  .orbit-ring-a { animation: orbit-spin 5s linear infinite; }
+  .orbit-ring-b { animation: orbit-spin 8.5s linear infinite reverse; }
+  .orbit-dot {
+    position: absolute;
+    top: -2px;
+    left: 50%;
+    width: 5px;
+    height: 5px;
+    margin-left: -2.5px;
+    border-radius: 9999px;
+    background: hsl(var(--primary));
+    box-shadow: 0 0 8px 1px hsl(var(--primary) / 0.7);
+  }
+  .orbit-dot-b {
+    width: 4px;
+    height: 4px;
+    background: #f59e0b;
+    box-shadow: 0 0 8px 1px rgb(245 158 11 / 0.6);
+  }
+  @keyframes orbit-spin {
+    to { transform: rotate(360deg); }
+  }
+  @keyframes orbit-breathe {
+    0%, 100% { transform: scale(0.82); opacity: 0.65; }
+    50% { transform: scale(1.1); opacity: 1; }
+  }
+  /* Cascading typing dots used after "Thinking" / tool names. */
+  .tdots {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    color: hsl(var(--primary));
+  }
+  .tdot {
+    width: 4px;
+    height: 4px;
+    border-radius: 9999px;
+    background: currentColor;
+    animation: tdot-bounce 1.2s ease-in-out infinite;
+  }
+  .tdot:nth-child(2) { animation-delay: 150ms; }
+  .tdot:nth-child(3) { animation-delay: 300ms; }
+  @keyframes tdot-bounce {
+    0%, 60%, 100% { transform: translateY(0); opacity: 0.45; }
+    30% { transform: translateY(-3px); opacity: 1; }
+  }
+}
+
+/* Directional keyframes, defined manually so tab panels can reference them
+   even when no animate-* utility is in use. */
+@keyframes rise-in {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes slide-from-left {
+  from { opacity: 0; transform: translateX(-14px) scale(0.97); }
+  to { opacity: 1; transform: translateX(0) scale(1); }
+}
+@keyframes slide-from-right {
+  from { opacity: 0; transform: translateX(14px) scale(0.97); }
+  to { opacity: 1; transform: translateX(0) scale(1); }
+}
+@keyframes slide-from-top {
+  from { opacity: 0; transform: translateY(-8px) scale(0.97); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes slide-from-bottom {
+  from { opacity: 0; transform: translateY(8px) scale(0.97); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Respect users who prefer reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Ultra-Low Bandwidth (<40 kbps) Speed Mode Optimizations */
+.perf-ultra-low * {
+  animation-duration: 0.001ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.001ms !important;
+  box-shadow: none !important;
+  text-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+.perf-ultra-low .orb,
+.perf-ultra-low .orbit-dot,
+.perf-ultra-low .orbit-core,
+.perf-ultra-low .orbit-ring {
+  display: none !important;
+}
+
+.perf-ultra-low {
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+}
+
+.hljs {
+  background: transparent !important;
+  padding: 0 !important;
+}
+
+.xterm .xterm-viewport {
+  background-color: transparent !important;
+}
