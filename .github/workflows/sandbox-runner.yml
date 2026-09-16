@@ -1,0 +1,38 @@
+name: Rawal AI Sandbox Runner
+
+on:
+  workflow_dispatch:
+    inputs:
+      command:
+        description: 'Command to execute in isolated sandbox'
+        required: true
+        type: string
+      project_name:
+        description: 'Target project / workspace'
+        required: false
+        default: 'sandbox-run'
+
+jobs:
+  run-sandbox:
+    name: Execute in Isolated GitHub Cloud Sandbox
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Execute Agent Command
+        run: |
+          echo "=== RUNNING IN GITHUB ACTIONS CLOUD RUNNER ==="
+          ${{ inputs.command }}
