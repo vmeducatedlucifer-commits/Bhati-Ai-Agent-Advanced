@@ -258,14 +258,15 @@ export default function AgentsPanel() {
   useEffect(() => {
     if (!activeThreadId) return;
     setError(null);
-    refreshSubAgents().catch((e: Error) => setError(e.message));
-    refreshSwarms().catch((e: Error) => setError(e.message));
-    const interval = setInterval(() => {
-      refreshSubAgents().catch(() => {});
-      refreshSwarms().catch(() => {});
-    }, 3000);
+    const doRefresh = async () => {
+      try { await refreshSubAgents(); } catch (e) { setError(String(e)); }
+      try { await refreshSwarms(); } catch (e) { setError(String(e)); }
+    };
+    void doRefresh();
+    const interval = setInterval(() => { void doRefresh(); }, 3000);
     return () => clearInterval(interval);
-  }, [activeThreadId, refreshSubAgents, refreshSwarms]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeThreadId]);
 
   useEffect(() => {
     if (selectedAgentId && activeThreadId) {
