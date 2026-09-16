@@ -1252,7 +1252,9 @@ export const useStore = create<State>((set, get) => ({
     try {
       const agents = await api.listSubAgents(threadId);
       set({ subAgents: agents });
-    } catch { /* ignore */ }
+    } catch (e) {
+      console.error("[AgentsPanel] refreshSubAgents failed:", e);
+    }
   },
 
   async refreshSwarms() {
@@ -1261,7 +1263,9 @@ export const useStore = create<State>((set, get) => ({
     try {
       const swarms = await api.listSwarms(threadId);
       set({ swarms });
-    } catch { /* ignore */ }
+    } catch (e) {
+      console.error("[AgentsPanel] refreshSwarms failed:", e);
+    }
   },
 
   selectAgent(agentId) { set({ selectedAgentId: agentId }); },
